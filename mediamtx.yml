@@ -1,0 +1,9 @@
+hls: yes
+hlsAddress: :8888
+hlsVariant: lowLatency
+hlsAlwaysRemux: yes
+hlsSegmentDuration: 2s
+
+paths:
+  live:
+    source: publisher

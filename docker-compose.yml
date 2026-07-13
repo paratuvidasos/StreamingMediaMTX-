@@ -1,0 +1,10 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    restart: unless-stopped
+    ports:
+      - "1935:1935"   # RTMP ingesta (TCP directo, no pasa por Traefik)
+    expose:
+      - "8888"        # HLS (esto sí va detrás de Traefik)
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml
