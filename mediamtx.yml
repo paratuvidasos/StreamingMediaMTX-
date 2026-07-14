@@ -21,7 +21,7 @@ webrtcAllowOrigin: "https://universidad.sosparatuvida.com.co"
 # Autenticación (webhook en business-service-api)
 ###############################################
 authMethod: http
-authHTTPAddress: https://businessapi.sosparatuvida.com.co/api/v1/streams/auth
+authHTTPAddress: http://sos-business-api-6vdzd8:3000/api/v1/streams/auth
 authHTTPExclude:
   - action: read # espectadores ven sin credenciales (fase 1)
   - action: playback

@@ -10,3 +10,7 @@ services:
       - "8889"             # WHIP -> publish.sosparatuvida.com.co - NUEVO
     volumes:
       - ./mediamtx.yml:/mediamtx.yml
+
+networks:
+  dokploy-network:
+    external: true
