@@ -1,9 +1,33 @@
+###############################################
+# HLS (salida para espectadores)
+###############################################
 hls: yes
 hlsAddress: :8888
 hlsVariant: lowLatency
 hlsAlwaysRemux: yes
 hlsSegmentDuration: 2s
 
+###############################################
+# WebRTC / WHIP (ingesta desde navegador)
+###############################################
+webrtc: yes
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+webrtcAdditionalHosts: [publish.sosparatuvida.com.co]
+webrtcIPsFromInterfaces: no
+
+###############################################
+# Autenticación (webhook en business-service-api)
+###############################################
+authMethod: http
+authHTTPAddress: https://businessapi.sosparatuvida.com.co/api/v1/streams/auth
+authHTTPExclude:
+  - action: read # espectadores ven sin credenciales (fase 1)
+  - action: playback
+
+###############################################
+# Paths
+###############################################
 paths:
-  live:
+  ~^.*$:
     source: publisher

@@ -3,8 +3,10 @@ services:
     image: bluenviron/mediamtx:latest
     restart: unless-stopped
     ports:
-      - "1935:1935"   # RTMP ingesta (TCP directo, no pasa por Traefik)
+      - "1935:1935"        # RTMP (OBS)
+      - "8189:8189/udp"    # WebRTC media - NUEVO
     expose:
-      - "8888"        # HLS (esto sí va detrás de Traefik)
+      - "8888"             # HLS -> stream.sosparatuvida.com.co
+      - "8889"             # WHIP -> publish.sosparatuvida.com.co - NUEVO
     volumes:
       - ./mediamtx.yml:/mediamtx.yml
