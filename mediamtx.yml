@@ -15,6 +15,7 @@ webrtcAddress: :8889
 webrtcLocalUDPAddress: :8189
 webrtcAdditionalHosts: [publish.sosparatuvida.com.co]
 webrtcIPsFromInterfaces: no
+webrtcAllowOrigin: "https://universidad.sosparatuvida.com.co"
 
 ###############################################
 # Autenticación (webhook en business-service-api)
