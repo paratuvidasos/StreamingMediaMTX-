@@ -3,7 +3,7 @@
 ###############################################
 hls: yes
 hlsAddress: :8888
-hlsVariant: lowLatency
+hlsVariant: mpegts
 hlsAlwaysRemux: yes
 hlsSegmentDuration: 2s
 
