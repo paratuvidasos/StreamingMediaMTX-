@@ -3,7 +3,7 @@
 ###############################################
 hls: yes
 hlsAddress: :8888
-hlsVariant: mpegts
+hlsVariant: fmp4
 hlsAlwaysRemux: yes
 hlsSegmentDuration: 2s
 
