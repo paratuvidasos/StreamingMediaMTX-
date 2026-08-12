@@ -18,6 +18,12 @@ webrtcIPsFromInterfaces: no
 webrtcAllowOrigin: "https://universidad.sosparatuvida.com.co"
 
 ###############################################
+# API de control (NUEVO - activar/desactivar grabación en caliente)
+###############################################
+api: yes
+apiAddress: :9997
+
+###############################################
 # Autenticación (webhook en business-service-api)
 ###############################################
 authMethod: http
@@ -32,3 +38,11 @@ authHTTPExclude:
 paths:
   ~^.*$:
     source: publisher
+    record: no # arranca apagado, se activa por API cuando el profesor da "Grabar"
+    recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S-%f
+    recordFormat: fmp4
+    recordSegmentDuration: 4h
+    runOnRecordSegmentComplete: >
+      curl -X POST http://sos-business-api-6vdzd8:3000/api/v1/streams/recording-ready
+      -H "Content-Type: application/json"
+      -d '{"path":"%path","file":"%MTX_SEGMENT_PATH"}'

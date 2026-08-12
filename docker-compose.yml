@@ -8,8 +8,13 @@ services:
     expose:
       - "8888"             # HLS -> stream.sosparatuvida.com.co
       - "8889"             # WHIP -> publish.sosparatuvida.com.co - NUEVO
+      - "9997"             # API de control (NUEVO) - solo interno, nunca en "ports"
     volumes:
       - ./mediamtx.yml:/mediamtx.yml
+      - ./recordings:/recordings   # NUEVO - persiste grabaciones fuera del contenedor
+    networks:
+      - dokploy-network
+
 
 networks:
   dokploy-network:
