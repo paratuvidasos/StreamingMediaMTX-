@@ -38,11 +38,34 @@ authHTTPExclude:
 paths:
   ~^.*$:
     source: publisher
-    record: no # arranca apagado, se activa por API cuando el profesor da "Grabar"
+
+    # Graba SIEMPRE, desde el primer frame que publica el docente.
+    #
+    # Antes esto estaba en "no" y se encendía por API con
+    # /v3/config/paths/patch/{path}. Eso no podía funcionar: la API opera
+    # sobre las entradas *configuradas* y aquí la única entrada es el patrón
+    # "~^.*$", no el nombre concreto de la sesión. Además dejaba fuera de la
+    # grabación todo lo transmitido antes de que llegara la petición.
+    record: yes
+
+    # La carpeta que se crea es el nombre del path, que en esta plataforma es
+    # la stream_key de la sesión. El backend la usa para resolver la materia.
     recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S-%f
     recordFormat: fmp4
-    recordSegmentDuration: 4h
-    runOnRecordSegmentComplete: >
-      curl -X POST http://sos-business-api-6vdzd8:3000/api/v1/streams/recording-ready
-      -H "Content-Type: application/json"
-      -d '{"path":"%path","file":"%MTX_SEGMENT_PATH"}'
+
+    # Duración *mínima* del segmento. Se pone alta a propósito: el segmento se
+    # cierra igualmente cuando el docente deja de publicar, así que en la
+    # práctica una clase = un archivo = una lección. Bajarlo partiría las
+    # clases largas en varias lecciones sueltas.
+    recordSegmentDuration: 12h
+
+    # Red de seguridad, no la vía normal de limpieza: el archivo se conserva
+    # una semana por si hay que reprocesarlo. El valor por defecto de MediaMTX
+    # es 1d, demasiado justo si una subida falla un fin de semana.
+    recordDeleteAfter: 7d
+
+    # NO usar runOn* aquí. La imagen oficial bluenviron/mediamtx se construye
+    # FROM scratch: no trae shell ni curl, así que cualquier hook falla en
+    # silencio. El descubrimiento de grabaciones terminadas lo hace el barrido
+    # periódico de business-service-api (src/cron/recordings.cron.js), que
+    # además sobrevive a reinicios y no pierde eventos.

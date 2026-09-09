@@ -4,18 +4,48 @@ services:
     restart: unless-stopped
     ports:
       - "1935:1935"        # RTMP (OBS)
-      - "8189:8189/udp"    # WebRTC media - NUEVO
+      - "8189:8189/udp"    # WebRTC media
     expose:
       - "8888"             # HLS -> stream.sosparatuvida.com.co
-      - "8889"             # WHIP -> publish.sosparatuvida.com.co - NUEVO
-      - "9997"             # API de control (NUEVO) - solo interno, nunca en "ports"
+      - "8889"             # WHIP/WHEP -> publish.sosparatuvida.com.co
+      - "9997"             # API de control - solo interno, nunca en "ports"
     volumes:
       - ./mediamtx.yml:/mediamtx.yml
-      - ./recordings:/recordings   # NUEVO - persiste grabaciones fuera del contenedor
+      # Volumen COMPARTIDO con business-service-api: MediaMTX escribe aquí las
+      # grabaciones y el backend las lee para subirlas a S3. Tiene que ser un
+      # volumen con nombre (no un bind "./recordings") porque el backend corre
+      # como otro servicio de Dokploy y necesita montar exactamente el mismo.
+      #
+      # Crear una sola vez en el host:  docker volume create sos-recordings
+      - sos-recordings:/recordings
+    networks:
+      - dokploy-network
+
+  # Puente de audio/imágenes en vivo hacia n8n.
+  #
+  # Opcional: solo arranca con `docker compose --profile n8n up -d`. Sin él, el
+  # backend sigue mandando a n8n los eventos de la clase (inicio, fin, URL de
+  # la grabación); este contenedor añade el contenido en tiempo casi real.
+  n8n-bridge:
+    build: ./n8n-bridge
+    restart: unless-stopped
+    profiles: ["n8n"]
+    environment:
+      MEDIAMTX_API: http://mediamtx:9997
+      MEDIAMTX_RTSP: rtsp://mediamtx:8554
+      N8N_WEBHOOK_URL: ${N8N_MEDIA_WEBHOOK_URL:-}
+      CHUNK_SECONDS: "30"     # duración de cada fragmento de audio
+      SNAPSHOT_SECONDS: "0"   # >0 para enviar además una imagen cada N segundos
+    depends_on:
+      - mediamtx
     networks:
       - dokploy-network
 
 
 networks:
   dokploy-network:
+    external: true
+
+volumes:
+  sos-recordings:
     external: true
